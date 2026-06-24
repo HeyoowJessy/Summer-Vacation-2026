@@ -1,0 +1,1074 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Jessy's 2026 Travel Adventure Planner</title>
+<style>
+  :root{
+    --bg:#fffaf6;
+    --ink:#334155;
+    --muted:#64748b;
+    --card:#ffffffcc;
+    --shadow:0 12px 30px rgba(51,65,85,.12);
+    --radius:24px;
+  }
+  *{box-sizing:border-box}
+  body{
+    margin:0;
+    font-family: "Times New Roman", Times, serif;
+    color:var(--ink);
+    background:
+      radial-gradient(circle at top left,#ffe4ec 0,#fffaf6 32%,#e9f7ff 100%);
+    min-height:100vh;
+  }
+  header{
+    padding:28px 20px 18px;
+    text-align:center;
+  }
+  h1{
+    margin:0;
+    font-size:clamp(28px,4vw,52px);
+    color:#475569;
+  }
+  .subtitle{
+    margin:10px auto 0;
+    max-width:900px;
+    font-size:18px;
+    color:var(--muted);
+  }
+  .topbar{
+    display:flex;
+    gap:10px;
+    justify-content:center;
+    flex-wrap:wrap;
+    padding:10px 16px 20px;
+  }
+  button, .mini-btn{
+    border:0;
+    border-radius:999px;
+    padding:12px 18px;
+    font-weight:800;
+    cursor:pointer;
+    color:#475569;
+    background:#fff;
+    box-shadow:0 6px 16px rgba(51,65,85,.12);
+    transition:.2s;
+  }
+  button:hover{transform:translateY(-2px)}
+  .save{background:#dcfce7}
+  .reset{background:#fee2e2}
+  .print{background:#e0f2fe}
+  .tabs{
+    display:flex;
+    gap:10px;
+    padding:12px;
+    overflow-x:auto;
+    position:sticky;
+    top:0;
+    background:rgba(255,250,246,.86);
+    backdrop-filter:blur(10px);
+    z-index:20;
+    border-top:1px solid #ffffff99;
+    border-bottom:1px solid #ffffff99;
+  }
+  .tab-btn{
+    min-width:max-content;
+    box-shadow:none;
+    border:3px solid transparent;
+  }
+  .tab-btn.active{border-color:#475569; transform:translateY(-2px)}
+  .taiwan{background:#fde2e4}
+  .thailand{background:#fff1b8}
+  .camiguin{background:#d8f3dc}
+  .boracay{background:#dbeafe}
+  .sgkl{background:#ede9fe}
+  .sokor{background:#fce7f3}
+  .notes{background:#ffedd5}
+  .receivables{background:#e0f2fe}
+  main{max-width:1200px; margin:0 auto; padding:20px}
+  .panel{display:none; animation:fade .25s ease}
+  .panel.active{display:block}
+  @keyframes fade{from{opacity:.35; transform:translateY(6px)} to{opacity:1; transform:translateY(0)}}
+  .hero{
+    border-radius:var(--radius);
+    padding:28px;
+    box-shadow:var(--shadow);
+    margin-bottom:22px;
+    background:var(--card);
+    border:4px solid #fff;
+  }
+  .hero h2{
+    margin:0 0 8px;
+    font-size:clamp(26px,3vw,42px);
+  }
+  .hero-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(230px,1fr));
+    gap:14px;
+    margin-top:18px;
+  }
+  .info{
+    padding:16px;
+    background:#ffffffaa;
+    border-radius:18px;
+    border:2px dashed #ffffff;
+    min-height:88px;
+  }
+  .label{font-size:13px; color:var(--muted); font-weight:800; text-transform:uppercase}
+  .value{font-size:20px; margin-top:5px; font-weight:900}
+  .days{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(290px,1fr));
+    gap:18px;
+  }
+  .day-card{
+    background:var(--card);
+    border-radius:22px;
+    padding:18px;
+    box-shadow:var(--shadow);
+    border:4px solid #fff;
+  }
+  .day-title{
+    font-size:24px;
+    font-weight:900;
+    margin-bottom:10px;
+  }
+  .editable{
+    width:100%;
+    min-height:90px;
+    border:2px dashed #cbd5e1;
+    border-radius:16px;
+    padding:12px;
+    background:#fff;
+    outline:none;
+    font-size:17px;
+    line-height:1.5;
+    white-space:pre-wrap;
+  }
+  .editable:focus{
+    border-color:#64748b;
+    box-shadow:0 0 0 4px rgba(100,116,139,.12);
+  }
+  .small-note{font-size:14px; color:var(--muted); margin-top:10px}
+  textarea{
+    width:100%;
+    min-height:480px;
+    border:0;
+    border-radius:22px;
+    padding:20px;
+    font-size:18px;
+    line-height:1.6;
+    color:var(--ink);
+    box-shadow:var(--shadow);
+    outline:none;
+  }
+  details{
+    margin-top:12px;
+    background:#ffffff99;
+    border-radius:16px;
+    padding:12px;
+  }
+  summary{font-weight:900; cursor:pointer}
+  ul{padding-left:22px}
+
+  .ledger-wrap{
+    overflow-x:auto;
+    background:#ffffffcc;
+    border-radius:22px;
+    padding:12px;
+    box-shadow:var(--shadow);
+  }
+  .ledger-table{
+    width:100%;
+    border-collapse:collapse;
+    min-width:980px;
+    background:#fff;
+    border-radius:18px;
+    overflow:hidden;
+  }
+  .ledger-table th{background:#e0f2fe;color:#334155;}
+  .ledger-table th,.ledger-table td{
+    border-bottom:1px solid #e2e8f0;
+    padding:8px;
+    vertical-align:top;
+  }
+  .ledger-table input,.ledger-table select,.ledger-table textarea{
+    width:100%;
+    border:1px solid #cbd5e1;
+    border-radius:10px;
+    padding:8px;
+    font-family:inherit;
+    font-size:15px;
+    background:#fff;
+  }
+  .ledger-table textarea{min-height:42px;resize:vertical;}
+  .summary-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(180px,1fr));
+    gap:14px;
+    margin:16px 0;
+  }
+  .summary-card{
+    padding:16px;
+    background:#fff;
+    border-radius:18px;
+    box-shadow:var(--shadow);
+    border:3px solid #fff;
+  }
+  .summary-value{font-size:22px;font-weight:900;color:#0f766e;margin-top:6px;}
+  .rate-grid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(190px,1fr));
+    gap:12px;
+    margin:12px 0;
+  }
+  .rate-grid input{
+    width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:12px;font-family:inherit;font-size:16px;
+  }
+
+  @media print{
+    .tabs,.topbar{display:none}
+    .panel{display:block; page-break-after:always}
+    body{background:white}
+    .day-card,.hero,textarea{box-shadow:none}
+  }
+
+  .toggle-btn{
+    margin:10px 0 14px;
+    background:#ffffff;
+    border:2px solid #cbd5e1;
+  }
+  .trip-details{display:none;}
+  .trip-details.show{display:grid;}
+  .time-line{
+    font-weight:900;
+    display:block;
+    margin-top:1.5em;
+  }
+  .time-line:first-child{margin-top:0;}
+
+</style>
+</head>
+<body>
+<header>
+  <h1>🌏 Jessy’s 2026 Travel Adventure Planner</h1>
+  <p class="subtitle">Taiwan • Thailand • Camiguin • Boracay • SG-KL • Cebu–Taiwan • Receivables & Payables • Notes</p>
+</header>
+
+<div class="topbar">
+  <button class="save" onclick="saveAll()">💾 Save Changes Offline</button>
+  <button class="print" onclick="window.print()">🖨️ Print / Save as PDF</button>
+  <button class="reset" onclick="resetTrip()">🔄 Reset Saved Edits</button>
+</div>
+
+<nav class="tabs">
+  <button class="tab-btn taiwan active" onclick="openTab('taiwan',this)">🇹🇼 Taiwan</button>
+  <button class="tab-btn thailand" onclick="openTab('thailand',this)">🇹🇭 Thailand</button>
+  <button class="tab-btn camiguin" onclick="openTab('camiguin',this)">🏝️ Camiguin</button>
+  <button class="tab-btn boracay" onclick="openTab('boracay',this)">🌊 Boracay</button>
+  <button class="tab-btn sgkl" onclick="openTab('sgkl',this)">🇸🇬 SG-KL 🇲🇾</button>
+  <button class="tab-btn sokor" onclick="openTab('sokor',this)">🇵🇭 Cebu–Taiwan</button>
+  <button class="tab-btn receivables" onclick="openTab('receivables',this)">💰 Receivables & Payables</button>
+  <button class="tab-btn notes" onclick="openTab('notes',this)">📝 Notes</button>
+</nav>
+
+<main>
+
+<section id="taiwan" class="panel active">
+  <div class="hero taiwan">
+    <h2>🇹🇼 July 8–11 Taiwan Trip</h2>
+    <p>Previous Taiwan trip structure: Day 1–4 editable itinerary cards.</p>
+    <div class="hero-grid">
+      <div class="info"><div class="label">Dates</div><div class="value">July 8–11</div></div>
+      <div class="info"><div class="label">Main Route</div><div class="value">Taipei • Sun Moon Lake • Kaohsiung • Manila</div></div>
+      <div class="info"><div class="label">Accommodation</div><div class="value">Cosmos Hotel • Jessy’s Apartment • Kaohsiung</div></div>
+    </div>
+  </div>
+  <button class="toggle-btn" onclick="toggleDetails('taiwan')">👀 Show / Hide Itinerary</button>
+  <div class="days trip-details" id="taiwan-details">
+    <div class="day-card"><div class="day-title">Day 1 — July 8: Arrival + Taipei</div>
+      <div class="editable" contenteditable="true" data-key="taiwan-d1">MNL NAIA T3 → Taipei T1
+6:35 AM–9:00 AM flight
+Jessy pickup at arrival
+Airport train to Taipei
+Brunch in Taipei
+11:30 AM baggage drop
+12:30–4:00 PM Taipei Zoo & Maokong Gondola
+5:00–7:00 PM Hooters dinner
+8:00 PM Taipei 101
+10:00 PM Ximending
+Hotel: Cosmos Hotel Taipei</div>
+    </div>
+    <div class="day-card"><div class="day-title">Day 2 — July 9: Taipei + North Coast</div>
+      <div class="editable" contenteditable="true" data-key="taiwan-d2">6:00 AM wake up and prepare
+CKS Memorial Hall
+North Coast trip
+Must-try Taipei foods
+Accommodation: Jessy’s Apartment</div>
+    </div>
+    <div class="day-card"><div class="day-title">Day 3 — July 10: Sun Moon Lake + Kaohsiung</div>
+      <div class="editable" contenteditable="true" data-key="taiwan-d3">6:00 AM leave Changhua
+THSR Taichung station
+7:40 AM bus 6670B to Sun Moon Lake
+9:30 AM Wenwu Temple
+10:30 AM boat tour
+11:30 AM lunch at old street
+1:00 PM explore Sun Moon Lake
+4:00 PM bus to Taichung railway station
+6:30 PM Miyahara Taichung
+8:00 PM THSR Taichung → Kaohsiung
+9:45 PM hotel check-in
+Hotel: Lilong Hotel Kaohsiung</div>
+    </div>
+    <div class="day-card"><div class="day-title">Day 4 — July 11: Alishan + Kaohsiung</div>
+      <div class="editable" contenteditable="true" data-key="taiwan-d4">Morning
+
+Changhua → Chiayi
+
+Chiayi → Alishan
+
+Alishan forest visit
+
+Alishan → Kaohsiung station
+
+Dome of Light
+
+Love River
+
+Must-try foods in Kaohsiung
+
+<span class="time-line">18:30 PM</span>
+
+Flight from KHH to Manila
+
+<span class="time-line">20:00 PM</span>
+
+Arrive in Manila</div>
+    </div>
+  </div>
+</section>
+
+<section id="thailand" class="panel">
+  <div class="hero thailand">
+    <h2>🇹🇭 July 13–18 Thailand Trip</h2>
+    <p>Pattaya + Bangkok itinerary based on the updated table.</p>
+    <div class="hero-grid">
+      <div class="info"><div class="label">Dates</div><div class="value">July 13–18</div></div>
+      <div class="info"><div class="label">Route</div><div class="value">Cebu → Bangkok → Pattaya → Bangkok → Cebu</div></div>
+      <div class="info"><div class="label">Accommodation</div><div class="value">Pattaya Airbnb • Bangkok Airbnb</div></div>
+    </div>
+  </div>
+  <button class="toggle-btn" onclick="toggleDetails('thailand')">👀 Show / Hide Itinerary</button>
+  <div class="days trip-details" id="thailand-details">
+    <div class="day-card"><div class="day-title">July 13 — Cebu to Thailand + Pattaya</div><div class="editable" contenteditable="true" data-key="thai-d1"><span class="time-line">5:00 AM–2:25 PM</span>
+Departure Cebu to Suvarnabhumi Airport
+4-hour layover in Hanoi
+
+<span class="time-line">3:30 PM onwards</span>
+Airport to Pattaya
+
+<span class="time-line">7:00 PM onwards</span>
+Walking Street Pattaya Beach
+
+Accommodation:
+Pattaya Airbnb
+Chokchai Village 9</div></div>
+
+    <div class="day-card"><div class="day-title">July 14 — Nong Nooch + Pattaya Beach</div><div class="editable" contenteditable="true" data-key="thai-d2"><span class="time-line">8:00 AM–3:00 PM</span>
+Nong Nooch Tropical Garden
+Klook: 962 NTD
+Admission + Thai lunch + sightseeing bus
+
+<span class="time-line">4:00–6:00 PM</span>
+House of Benedict
+
+<span class="time-line">7:00 PM</span>
+Pattaya Beach for Dinner
+
+Accommodation:
+Pattaya Airbnb
+Chokchai Village 9</div></div>
+
+    <div class="day-card"><div class="day-title">July 15 — Floating Market + Bangkok</div><div class="editable" contenteditable="true" data-key="thai-d3"><span class="time-line">9:00 AM</span>
+Check out and visit Pattaya Floating Market
+Klook: Admission + rowing boat 481 NTD
+Afterwards, head to Terminal 21 for shopping and lunch
+
+<span class="time-line">3:00 PM</span>
+Airbnb check-in in Bangkok
+
+<span class="time-line">4:00 PM</span>
+King Power Mahanakhon Skywalk
+Klook: 1,153 NTD
+
+<span class="time-line">8:00 PM</span>
+Chinatown
+
+Accommodation:
+Bangkok Airbnb</div></div>
+
+    <div class="day-card"><div class="day-title">July 16 — Wat Arun + Cruise</div><div class="editable" contenteditable="true" data-key="thai-d4"><span class="time-line">9:00 AM</span>
+Wat Arun
+
+<span class="time-line">11:00 AM</span>
+Corgi in the Garden
+
+<span class="time-line">12:00 PM</span>
+IconSiam
+
+<span class="time-line">2:00–4:00 PM</span>
+Nap time at the Airbnb
+
+<span class="time-line">5:00 PM</span>
+Asiatique Sky Ferris Wheel
+
+<span class="time-line">6:00 PM</span>
+Chao Phraya River Cruise
+Klook: 1,151 NTD
+
+Accommodation:
+Bangkok Airbnb</div></div>
+
+    <div class="day-card"><div class="day-title">July 17 — Safari World + Jodd’s Fair</div><div class="editable" contenteditable="true" data-key="thai-d5"><span class="time-line">9:00 AM–6:00 PM</span>
+Bangkok Safari World
+Klook: 1,615 NTD
+1-day pass + international buffet + join-in Klook bus
+Departure from Siam Paragon
+
+<span class="time-line">7:00 PM</span>
+Jodd’s Fair
+
+Accommodation:
+Bangkok Airbnb</div></div>
+
+    <div class="day-card"><div class="day-title">July 18 — Markets + Departure</div><div class="editable" contenteditable="true" data-key="thai-d6"><span class="time-line">9:30 AM</span>
+Chatuchak Weekend Market
+
+<span class="time-line">11:30 AM</span>
+Co-limited CentralWorld
+
+<span class="time-line">1:30 PM onwards</span>
+Pratunam Market & Palladium
+
+<span class="time-line">3:30 PM</span>
+Nap time at the hotel and prepare for checkout
+
+<span class="time-line">7:00 PM</span>
+Checkout and head to the airport
+
+<span class="time-line">11:00 PM</span>
+Departure flight back to Cebu
+
+Accommodation:
+Bangkok Airbnb until checkout</div></div>
+  </div>
+</section>
+
+<section id="camiguin" class="panel">
+  <div class="hero camiguin">
+    <h2>🏝️ July 19–August 4 Camiguin</h2>
+    <p>Long-stay island rest, family time, and slow travel plan.</p>
+    <div class="hero-grid">
+      <div class="info"><div class="label">Dates</div><div class="value">July 19–August 4</div></div>
+      <div class="info"><div class="label">Style</div><div class="value">Relaxed island stay</div></div>
+      <div class="info"><div class="label">Editable</div><div class="value">Add your daily plans</div></div>
+    </div>
+  </div>
+  <button class="toggle-btn" onclick="toggleDetails('camiguin')">👀 Show / Hide Itinerary</button>
+  <div class="days trip-details" id="camiguin-details">
+    <div class="day-card"><div class="day-title">Week 1 — July 20–26</div><div class="editable" contenteditable="true" data-key="camiguin-w1">July 19
+
+<span class="time-line">08:40 AM</span>
+
+Flight to Camiguin
+
+<span class="time-line">09:30 AM</span>
+
+Arrive in Camiguin
+
+July 20–26
+
+Family time
+
+White Island
+
+Sunken Cemetery
+
+Old Church Ruins
+
+Hot spring / cold spring
+
+Rest day</div></div>
+    <div class="day-card"><div class="day-title">Week 2 — July 27–August 2</div><div class="editable" contenteditable="true" data-key="camiguin-w2">July 27–August 3
+
+Waterfalls
+
+Cafe / local food
+
+Beach day
+
+Souvenir shopping
+
+Laundry / packing
+
+Family bonding
+
+Prepare for Boracay trip</div></div>
+    <div class="day-card"><div class="day-title">August 3 — Travel Day</div><div class="editable" contenteditable="true" data-key="camiguin-d3">August 4
+
+<span class="time-line">12:55 PM</span>
+
+Camiguin to Cebu
+
+<span class="time-line">13:45 PM</span>
+
+Arrive in Cebu
+
+<span class="time-line">15:15 PM</span>
+
+Cebu to Boracay
+
+<span class="time-line">16:20 PM</span>
+
+Arrive in Boracay
+
+Hotel check-in / rest</div></div>
+  </div>
+</section>
+
+<section id="boracay" class="panel">
+  <div class="hero boracay">
+    <h2>🌊 August 4–7 Boracay</h2>
+    <p>Beach, sunset, food, and free-time planner.</p>
+    <div class="hero-grid">
+      <div class="info"><div class="label">Dates</div><div class="value">August 4–7</div></div>
+      <div class="info"><div class="label">Main Activity</div><div class="value">Beach + Island Hopping</div></div>
+      <div class="info"><div class="label">Vibe</div><div class="value">Relaxing tropical trip</div></div>
+    </div>
+  </div>
+  <button class="toggle-btn" onclick="toggleDetails('boracay')">👀 Show / Hide Itinerary</button>
+  <div class="days trip-details" id="boracay-details">
+    <div class="day-card"><div class="day-title">August 4 — Arrival</div><div class="editable" contenteditable="true" data-key="bora-d1">August 4
+
+<span class="time-line">16:20 PM</span>
+
+Arrive in Boracay
+
+Hotel check-in
+
+White Beach sunset
+
+Dinner</div></div>
+    <div class="day-card"><div class="day-title">August 5 — Beach Day</div><div class="editable" contenteditable="true" data-key="bora-d2">August 5
+
+Breakfast
+
+Beach time
+
+Cafe / lunch
+
+Sunset photos
+
+Dinner</div></div>
+    <div class="day-card"><div class="day-title">August 6 — Island Hopping</div><div class="editable" contenteditable="true" data-key="bora-d3">August 6
+
+Island hopping
+
+Snorkeling / beach stops
+
+Local food
+
+Rest
+
+Pack luggage</div></div>
+    <div class="day-card"><div class="day-title">August 7 — Boracay to Cebu</div><div class="editable" contenteditable="true" data-key="bora-d4">August 7
+
+Morning free time
+
+Souvenir shopping
+
+Check out
+
+<span class="time-line">13:45 PM</span>
+
+Boracay to Cebu
+
+<span class="time-line">14:44 PM</span>
+
+Arrive in Cebu</div></div>
+    <div class="day-card"><div class="day-title">August 7–8 — Cebu to Singapore</div><div class="editable" contenteditable="true" data-key="bora-d5">August 7
+
+<span class="time-line">20:40 PM</span>
+
+Cebu to Singapore
+
+August 8
+
+<span class="time-line">00:30 AM</span>
+
+Arrive in Singapore</div></div>
+  </div>
+</section>
+
+<section id="sgkl" class="panel">
+  <div class="hero sgkl">
+    <h2>🇸🇬🇲🇾 August 7–14 Singapore • Malacca • Kuala Lumpur</h2>
+    <p>Updated plan: Singapore 3D2N, Malacca, then Kuala Lumpur. Departure from KL to Cebu on August 14.</p>
+    <div class="hero-grid">
+      <div class="info"><div class="label">Dates</div><div class="value">August 7–14</div></div>
+      <div class="info"><div class="label">Route</div><div class="value">Cebu → Singapore → Malacca → Kuala Lumpur → Cebu</div></div>
+      <div class="info"><div class="label">Stay Style</div><div class="value">3D2N Singapore • Malacca • KL</div></div>
+    </div>
+  </div>
+  <button class="toggle-btn" onclick="toggleDetails('sgkl')">👀 Show / Hide Itinerary</button>
+  <div class="days trip-details" id="sgkl-details">
+    <div class="day-card"><div class="day-title">August 7–8 — Cebu to Singapore</div><div class="editable" contenteditable="true" data-key="sgkl-d1">August 7
+
+<span class="time-line">20:40 PM</span>
+Cebu to Singapore
+
+August 8
+
+<span class="time-line">00:30 AM</span>
+Arrive in Singapore
+
+Hotel / hostel check-in or baggage drop
+Rest
+Marina Bay Sands area
+Merlion Park
+Spectra Light Show</div></div>
+
+    <div class="day-card"><div class="day-title">August 9 — Singapore Full Day</div><div class="editable" contenteditable="true" data-key="sgkl-d2">Singapore 3D2N
+
+Universal Studios Singapore or Sentosa
+Gardens by the Bay
+Chinatown
+Little India
+Bugis / Hawker food center
+Evening free time</div></div>
+
+    <div class="day-card"><div class="day-title">August 10 — Singapore to Malacca</div><div class="editable" contenteditable="true" data-key="sgkl-d3">Morning Singapore free time
+Check out
+Travel from Singapore to Malacca
+Hotel check-in in Malacca
+Jonker Street Night Market / Dutch Square
+River walk</div></div>
+
+    <div class="day-card"><div class="day-title">August 11 — Malacca to Kuala Lumpur</div><div class="editable" contenteditable="true" data-key="sgkl-d4">Malacca heritage morning
+A Famosa
+Christ Church
+Stadthuys
+Jonker Street snacks
+Travel to Kuala Lumpur
+KL hotel check-in
+Petronas Towers night view</div></div>
+
+    <div class="day-card"><div class="day-title">August 12 — Kuala Lumpur Attractions</div><div class="editable" contenteditable="true" data-key="sgkl-d5">Batu Caves
+Central Market
+Merdeka Square
+KLCC / Petronas Towers
+Bukit Bintang
+Jalan Alor food street</div></div>
+
+    <div class="day-card"><div class="day-title">August 13–14 — KL Free Day + Flight to Cebu</div><div class="editable" contenteditable="true" data-key="sgkl-d6">August 13
+
+KL free day
+Shopping / café / laundry
+Pack luggage
+Rest before midnight flight
+
+August 14
+
+<span class="time-line">00:55 AM</span>
+Kuala Lumpur to Cebu
+Same departure time from KL
+
+Arrive in Cebu
+Start Cebu stay until August 19</div></div>
+  </div>
+</section>
+
+<section id="sokor" class="panel">
+  <div class="hero sokor">
+    <h2>🇵🇭🇹🇼 August 14–19 Cebu → Taiwan</h2>
+    <p>Cebu rest days after SG-KL, with two choices for August 15: Oslob overnight or Cebu City-only activities.</p>
+    <div class="hero-grid">
+      <div class="info"><div class="label">Arrival</div><div class="value">August 14, 8:35 AM in Cebu</div></div>
+      <div class="info"><div class="label">Must Be In Cebu City</div><div class="value">August 16</div></div>
+      <div class="info"><div class="label">Return</div><div class="value">August 19, 10:00 AM to Taiwan</div></div>
+    </div>
+  </div>
+  <button class="toggle-btn" onclick="toggleDetails('sokor')">👀 Show / Hide Itinerary</button>
+  <div class="days trip-details" id="sokor-details">
+    <div class="day-card"><div class="day-title">August 14 — Arrival in Cebu + Rest Day</div><div class="editable" contenteditable="true" data-key="cebu-d1">August 14
+
+<span class="time-line">00:55 AM</span>
+Depart from Singapore / SG-KL route
+
+<span class="time-line">08:35 AM</span>
+Arrive in Cebu
+
+Plan:
+Hotel check-in / baggage drop
+Rest for the whole day
+Laundry / recover from travel
+Light dinner only if everyone still has energy
+
+Suggested area to stay:
+Near Ayala Center Cebu / Cebu Business Park</div></div>
+
+    <div class="day-card"><div class="day-title">Alternative A — August 15–16: Oslob Overnight Plan</div><div class="editable" contenteditable="true" data-key="cebu-alt-a">August 15
+
+Early morning travel from Cebu City to Oslob
+Oslob Whale Shark watching
+Lunch in Oslob
+Optional: Tumalog Falls / beach stop / Sumilon view
+Overnight in Oslob or nearby area
+
+August 16
+
+Return to Cebu City
+Must be back in Cebu City
+Check-in / stay near Ayala Center Cebu
+Rest and light dinner
+
+Note:
+This option is more memorable but more tiring because travel time is long.</div></div>
+
+    <div class="day-card"><div class="day-title">Alternative B — August 15: Cebu City Must-Try Activities</div><div class="editable" contenteditable="true" data-key="cebu-alt-b">August 15
+
+Relaxed Cebu City day
+Magellan’s Cross
+Basilica Minore del Santo Niño
+Fort San Pedro
+Casa Gorordo or Yap-Sandiego Ancestral House
+Carbon Market photo/food stop
+Temple of Leah or Sirao Garden if time allows
+Dinner near Ayala / IT Park
+
+Note:
+This option is easier, less tiring, and better if everyone wants rest after many travel days.</div></div>
+
+    <div class="day-card"><div class="day-title">August 16 — Cebu City + Stay Near Ayala Center</div><div class="editable" contenteditable="true" data-key="cebu-d3">Must be in Cebu City
+Stay near Ayala Center Cebu
+Rest / laundry / errands
+Ayala Center Cebu
+Café or simple dinner
+Prepare for salon and shopping day</div></div>
+
+    <div class="day-card"><div class="day-title">August 17 — Hair Salon + Shopping + Street Food Evening</div><div class="editable" contenteditable="true" data-key="cebu-d4">Hair salon appointment
+Ayala Center Cebu shopping
+Souvenir / pasalubong shopping
+Rest at hotel
+
+Evening street food:
+Larsian BBQ
+Puso
+Ngohiong
+Chorizo de Cebu
+Siomai sa Tisa
+Halo-halo</div></div>
+
+    <div class="day-card"><div class="day-title">August 18 — IT Park + Street Food Hopping</div><div class="editable" contenteditable="true" data-key="cebu-d5">IT Park day
+Café hopping
+Sugbo Mercado / street food hopping
+Last-minute shopping
+Pack luggage
+Prepare documents for return to Taiwan</div></div>
+
+    <div class="day-card"><div class="day-title">August 19 — Cebu to Taiwan</div><div class="editable" contenteditable="true" data-key="cebu-d6"><span class="time-line">10:00 AM</span>
+Flight back to Taiwan
+
+Arrive in Taiwan
+Rest and prepare for work / school routine</div></div>
+  </div>
+</section>
+
+<section id="receivables" class="panel">
+  <div class="hero receivables">
+    <h2>💰 Receivables & Payables</h2>
+    <p>Editable offline tracker for all trips. Add rows now, then calculate only when you are ready.</p>
+    <div class="hero-grid">
+      <div class="info"><div class="label">Format</div><div class="value">Day • Description • Amount • Currency</div></div>
+      <div class="info"><div class="label">Payment</div><div class="value">Paid By • Cash/Card</div></div>
+      <div class="info"><div class="label">Works Offline</div><div class="value">Saved in this browser</div></div>
+    </div>
+  </div>
+
+  <div class="hero receivables">
+    <h2>Editable Ledger</h2>
+    <div class="rate-grid">
+      <label>Baht to PHP<br><input type="number" id="rateTHBPHP" value="1.60" step="0.01"></label>
+      <label>NTD to PHP<br><input type="number" id="rateNTDPHP" value="2.00" step="0.01"></label>
+      <label>MYR to PHP<br><input type="number" id="rateMYRPHP" value="12.00" step="0.01"></label>
+      <label>SGD to PHP<br><input type="number" id="rateSGDPHP" value="43.00" step="0.01"></label>
+    </div>
+    <div class="topbar">
+      <button class="save" onclick="addLedgerRow()">➕ Add Row</button>
+      <button class="save" onclick="saveLedger()">💾 Save Ledger</button>
+      <button class="print" onclick="calculateLedger()">🧮 Calculate Expenses</button>
+      <button class="reset" onclick="resetLedger()">🗑️ Clear Ledger</button>
+    </div>
+    <div class="small-note">The totals below will stay blank until you click <b>Calculate Expenses</b>. You may edit details anytime.</div>
+    <div class="ledger-wrap">
+      <table class="ledger-table" id="ledgerTable">
+        <thead><tr><th>Day</th><th>Description</th><th>Amount</th><th>Currency</th><th>Paid By</th><th>Cash/Card</th><th>Note</th><th>Delete</th></tr></thead>
+        <tbody id="ledgerBody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <div class="summary-grid">
+    <div class="summary-card"><div class="label">Total PHP</div><div class="summary-value" id="sumPHP">—</div></div>
+    <div class="summary-card"><div class="label">Cash Total</div><div class="summary-value" id="sumCash">—</div></div>
+    <div class="summary-card"><div class="label">Card Total</div><div class="summary-value" id="sumCard">—</div></div>
+    <div class="summary-card"><div class="label">Paid By Summary</div><div class="summary-value" id="sumPeople">—</div></div>
+  </div>
+
+  <div class="hero receivables">
+    <h2>Per Person / Paid By Breakdown</h2>
+    <div class="ledger-wrap">
+      <table class="ledger-table" id="paidBySummary">
+        <thead><tr><th>Paid By</th><th>Total PHP</th><th>Cash</th><th>Card</th><th>Notes</th></tr></thead>
+        <tbody><tr><td colspan="5">Click “Calculate Expenses” when ready.</td></tr></tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<section id="notes" class="panel">
+  <div class="hero notes">
+    <h2>📝 Travel Notes</h2>
+    <p>Type anything here. Click “Save Changes Offline” before closing the file.</p>
+  </div>
+  <textarea data-key="main-notes" placeholder="Write your notes, budget, packing list, booking details, reminders, and prayer intentions here..."></textarea>
+  <details>
+    <summary>Suggested Packing Checklist</summary>
+    <ul>
+      <li>Passport, IDs, tickets, hotel bookings</li>
+      <li>Cash, cards, travel insurance copy</li>
+      <li>Phone, charger, power bank, adapter</li>
+      <li>Light clothes, comfy shoes, swimsuit, jacket</li>
+      <li>Medicine, sunscreen, toiletries</li>
+    </ul>
+  </details>
+</section>
+
+</main>
+
+<script>
+const STORE_PREFIX = "jessy_2026_trip_";
+
+function openTab(id, btn){
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+  localStorage.setItem(STORE_PREFIX + "activeTab", id);
+}
+
+function saveAll(showAlert=true){
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    const key = el.dataset.key;
+    const value = el.tagName.toLowerCase() === 'textarea' ? el.value : el.innerHTML;
+    localStorage.setItem(STORE_PREFIX + key, value);
+  });
+  if(showAlert) alert("Saved offline on this browser/device! 💾");
+}
+
+function loadAll(){
+  document.querySelectorAll('[data-key]').forEach(el=>{
+    const key = el.dataset.key;
+    const saved = localStorage.getItem(STORE_PREFIX + key);
+    if(saved !== null){
+      if(el.tagName.toLowerCase() === 'textarea') el.value = saved;
+      else el.innerHTML = saved;
+    }
+  });
+  const active = localStorage.getItem(STORE_PREFIX + "activeTab");
+  if(active && document.getElementById(active)){
+    const button = [...document.querySelectorAll('.tab-btn')].find(b => b.getAttribute('onclick').includes("'" + active + "'"));
+    if(button) openTab(active, button);
+  }
+}
+
+function resetTrip(){
+  if(confirm("This will remove your saved offline edits and return the planner to the original version. Continue?")){
+    Object.keys(localStorage).forEach(k=>{
+      if(k.startsWith(STORE_PREFIX)) localStorage.removeItem(k);
+    });
+    location.reload();
+  }
+}
+
+let saveTimer;
+document.addEventListener('input', e=>{
+  if(e.target.matches('[data-key]')){
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(()=>saveAll(false), 500);
+  }
+});
+
+window.addEventListener('DOMContentLoaded', loadAll);
+
+function toggleDetails(id){
+  const box = document.getElementById(id + "-details");
+  if(box) box.classList.toggle("show");
+}
+
+
+function ledgerDefaultRows(){
+  return [
+    {day:'Aug 14',description:'Cebu arrival / taxi / food',amount:'',currency:'PHP',paidBy:'',method:'cash',note:''},
+    {day:'Aug 15',description:'Alternative A Oslob OR Alternative B Cebu City',amount:'',currency:'PHP',paidBy:'',method:'cash',note:''},
+    {day:'Aug 17',description:'Hair salon / shopping / street food',amount:'',currency:'PHP',paidBy:'',method:'cash',note:''},
+    {day:'Aug 18',description:'IT Park / Sugbo Mercado / street food',amount:'',currency:'PHP',paidBy:'',method:'cash',note:''}
+  ];
+}
+
+function loadLedger(){
+  try{
+    const saved = localStorage.getItem(STORE_PREFIX + 'ledgerRows');
+    if(saved) return JSON.parse(saved);
+  }catch(e){}
+  return ledgerDefaultRows();
+}
+
+function saveLedger(showAlert=true){
+  const rows = [...document.querySelectorAll('#ledgerBody tr')].map(tr=>({
+    day:tr.querySelector('[data-ledger="day"]').value,
+    description:tr.querySelector('[data-ledger="description"]').value,
+    amount:tr.querySelector('[data-ledger="amount"]').value,
+    currency:tr.querySelector('[data-ledger="currency"]').value,
+    paidBy:tr.querySelector('[data-ledger="paidBy"]').value,
+    method:tr.querySelector('[data-ledger="method"]').value,
+    note:tr.querySelector('[data-ledger="note"]').value
+  }));
+  localStorage.setItem(STORE_PREFIX + 'ledgerRows', JSON.stringify(rows));
+  localStorage.setItem(STORE_PREFIX + 'rateTHBPHP', document.getElementById('rateTHBPHP')?.value || '1.60');
+  localStorage.setItem(STORE_PREFIX + 'rateNTDPHP', document.getElementById('rateNTDPHP')?.value || '2.00');
+  localStorage.setItem(STORE_PREFIX + 'rateMYRPHP', document.getElementById('rateMYRPHP')?.value || '12.00');
+  localStorage.setItem(STORE_PREFIX + 'rateSGDPHP', document.getElementById('rateSGDPHP')?.value || '43.00');
+  if(showAlert) alert('Ledger saved offline! 💾');
+}
+
+function renderLedger(){
+  const body = document.getElementById('ledgerBody');
+  if(!body) return;
+  const rows = loadLedger();
+  body.innerHTML = '';
+  rows.forEach(row=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `
+      <td><input data-ledger="day" value="${escapeAttr(row.day)}"></td>
+      <td><input data-ledger="description" value="${escapeAttr(row.description)}"></td>
+      <td><input type="number" data-ledger="amount" value="${escapeAttr(row.amount)}"></td>
+      <td><select data-ledger="currency">
+        <option value="PHP" ${row.currency==='PHP'?'selected':''}>Peso</option>
+        <option value="THB" ${row.currency==='THB'?'selected':''}>Baht</option>
+        <option value="NTD" ${row.currency==='NTD'?'selected':''}>NTD</option>
+        <option value="MYR" ${row.currency==='MYR'?'selected':''}>MYR</option>
+        <option value="SGD" ${row.currency==='SGD'?'selected':''}>SGD</option>
+      </select></td>
+      <td><input data-ledger="paidBy" value="${escapeAttr(row.paidBy)}"></td>
+      <td><select data-ledger="method"><option value="cash" ${row.method==='cash'?'selected':''}>Cash</option><option value="card" ${row.method==='card'?'selected':''}>Card</option></select></td>
+      <td><textarea data-ledger="note">${escapeText(row.note)}</textarea></td>
+      <td><button class="reset" onclick="this.closest('tr').remove(); saveLedger(false)">X</button></td>`;
+    body.appendChild(tr);
+  });
+}
+
+function escapeAttr(str){return String(str||'').replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function escapeText(str){return String(str||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+
+function addLedgerRow(){
+  saveLedger(false);
+  const rows = loadLedger();
+  rows.push({day:'',description:'',amount:'',currency:'PHP',paidBy:'',method:'cash',note:''});
+  localStorage.setItem(STORE_PREFIX + 'ledgerRows', JSON.stringify(rows));
+  renderLedger();
+}
+
+function resetLedger(){
+  if(confirm('Clear all receivables and payables rows?')){
+    localStorage.removeItem(STORE_PREFIX + 'ledgerRows');
+    renderLedger();
+    clearLedgerSummary();
+  }
+}
+
+function clearLedgerSummary(){
+  if(document.getElementById('sumPHP')) document.getElementById('sumPHP').textContent = '—';
+  if(document.getElementById('sumCash')) document.getElementById('sumCash').textContent = '—';
+  if(document.getElementById('sumCard')) document.getElementById('sumCard').textContent = '—';
+  if(document.getElementById('sumPeople')) document.getElementById('sumPeople').textContent = '—';
+  const tbody = document.querySelector('#paidBySummary tbody');
+  if(tbody) tbody.innerHTML = '<tr><td colspan="5">Click “Calculate Expenses” when ready.</td></tr>';
+}
+
+function toPHP(amount, currency){
+  amount = Number(amount || 0);
+  const thb = Number(document.getElementById('rateTHBPHP')?.value || 1.60);
+  const ntd = Number(document.getElementById('rateNTDPHP')?.value || 2.00);
+  const myr = Number(document.getElementById('rateMYRPHP')?.value || 12.00);
+  const sgd = Number(document.getElementById('rateSGDPHP')?.value || 43.00);
+  if(currency === 'THB') return amount * thb;
+  if(currency === 'NTD') return amount * ntd;
+  if(currency === 'MYR') return amount * myr;
+  if(currency === 'SGD') return amount * sgd;
+  return amount;
+}
+
+function phpFmt(n){return '₱' + Number(n || 0).toLocaleString('en-US',{maximumFractionDigits:0})}
+
+function calculateLedger(){
+  saveLedger(false);
+  const rows = loadLedger();
+  let total = 0, cash = 0, card = 0;
+  const people = {};
+  rows.forEach(r=>{
+    const php = toPHP(r.amount, r.currency);
+    if(!r.description && !r.amount) return;
+    total += php;
+    if(r.method === 'card') card += php; else cash += php;
+    const payer = (r.paidBy || 'Unassigned').trim() || 'Unassigned';
+    if(!people[payer]) people[payer] = {total:0,cash:0,card:0,notes:[]};
+    people[payer].total += php;
+    if(r.method === 'card') people[payer].card += php; else people[payer].cash += php;
+    if(r.note) people[payer].notes.push(`${r.day} - ${r.description}: ${r.note}`);
+  });
+  document.getElementById('sumPHP').textContent = phpFmt(total);
+  document.getElementById('sumCash').textContent = phpFmt(cash);
+  document.getElementById('sumCard').textContent = phpFmt(card);
+  document.getElementById('sumPeople').textContent = Object.keys(people).length + ' payer(s)';
+  const tbody = document.querySelector('#paidBySummary tbody');
+  tbody.innerHTML = '';
+  Object.keys(people).sort().forEach(name=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${escapeText(name)}</td><td>${phpFmt(people[name].total)}</td><td>${phpFmt(people[name].cash)}</td><td>${phpFmt(people[name].card)}</td><td>${escapeText(people[name].notes.join('; '))}</td>`;
+    tbody.appendChild(tr);
+  });
+}
+
+window.addEventListener('DOMContentLoaded', ()=>{
+  setTimeout(()=>{
+    if(document.getElementById('ledgerBody')){
+      const thb = localStorage.getItem(STORE_PREFIX + 'rateTHBPHP');
+      const ntd = localStorage.getItem(STORE_PREFIX + 'rateNTDPHP');
+      const myr = localStorage.getItem(STORE_PREFIX + 'rateMYRPHP');
+      const sgd = localStorage.getItem(STORE_PREFIX + 'rateSGDPHP');
+      if(thb) document.getElementById('rateTHBPHP').value = thb;
+      if(ntd) document.getElementById('rateNTDPHP').value = ntd;
+      if(myr) document.getElementById('rateMYRPHP').value = myr;
+      if(sgd) document.getElementById('rateSGDPHP').value = sgd;
+      renderLedger();
+      document.addEventListener('input', e=>{ if(e.target.matches('[data-ledger]')) saveLedger(false); });
+      document.addEventListener('change', e=>{ if(e.target.matches('[data-ledger]')) saveLedger(false); });
+    }
+  }, 0);
+});
+
+</script>
+</body>
+</html>
